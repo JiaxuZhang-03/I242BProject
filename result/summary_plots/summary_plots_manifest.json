@@ -1,0 +1,11 @@
+{
+  "output_dir": "/Users/littleotter/Desktop/I242BProject/result/summary_plots",
+  "plots": [
+    "/Users/littleotter/Desktop/I242BProject/result/summary_plots/model_metric_comparison.png",
+    "/Users/littleotter/Desktop/I242BProject/result/summary_plots/validation_vs_test_accuracy.png",
+    "/Users/littleotter/Desktop/I242BProject/result/summary_plots/training_accuracy_curves.png",
+    "/Users/littleotter/Desktop/I242BProject/result/summary_plots/training_loss_curves.png",
+    "/Users/littleotter/Desktop/I242BProject/result/summary_plots/supcon_loss_curve.png",
+    "/Users/littleotter/Desktop/I242BProject/result/summary_plots/test_confusion_matrices.png"
+  ]
+}

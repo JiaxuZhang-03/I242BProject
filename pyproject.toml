@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "food-project"
+version = "0.1.0"
+description = "Food image classification experiments for EDA, CNN training, SupCon, evaluation, and Grad-CAM."
+requires-python = ">=3.10"
+dependencies = [
+  "torch==2.10.0",
+  "torchvision==0.25.0",
+  "numpy==2.4.2",
+  "pandas==3.0.0",
+  "scikit-learn==1.8.0",
+  "matplotlib==3.10.8",
+  "seaborn==0.13.2",
+  "Pillow==12.1.1",
+  "tqdm==4.67.3",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

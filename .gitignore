@@ -1,0 +1,34 @@
+# Data and local artifacts
+data/*
+!data/init.py
+!data/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Jupyter / notebooks
+.ipynb_checkpoints/
+
+# Result artifacts
+result/*/
+!result/summary_plots/
+!result/summary_plots/**
+result/.matplotlib/
+result/.torch/
+result/**/*.pt
+
+# OS / editor files
+.DS_Store
+.vscode/
+.idea/

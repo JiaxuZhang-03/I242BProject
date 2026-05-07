@@ -1,0 +1,4 @@
+experiment,split,best_val_acc,test_accuracy,macro_f1,weighted_f1,roc_auc,metrics_path
+resnet18_pretrained_frozen_128_e5,test,0.8563218390804598,0.8697318007662835,0.8697318007662835,0.8697318007662835,0.934425507552737,/Users/littleotter/Desktop/I242BProject/result/evaluation/resnet18_pretrained_frozen_128_e5/test_20260506_180249/metrics.json
+simple_cnn_supcon_finetune_128_e5,test,0.8084291187739464,0.8045977011494253,0.8033244680851064,0.8033244680851064,0.8813288119669411,/Users/littleotter/Desktop/I242BProject/result/evaluation/simple_cnn_supcon_finetune_128_e5/test_20260506_180249/metrics.json
+simple_cnn_128_e5,test,0.7988505747126436,0.8026819923371648,0.8026754748142031,0.8026754748142031,0.8869071211520678,/Users/littleotter/Desktop/I242BProject/result/evaluation/simple_cnn_128_e5/test_20260506_180249/metrics.json
