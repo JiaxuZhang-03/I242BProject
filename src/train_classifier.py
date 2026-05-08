@@ -25,6 +25,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--model-name", choices=MODEL_NAMES, default="simple_cnn")
     parser.add_argument("--pretrained", action="store_true")
     parser.add_argument("--freeze-backbone", action="store_true")
+    parser.add_argument(
+        "--init-checkpoint",
+        type=Path,
+        default=None,
+        help="Optional classifier checkpoint used to initialize model weights before training.",
+    )
     parser.add_argument("--supcon-checkpoint", type=Path, default=None)
     parser.add_argument("--image-size", type=int, default=224)
     parser.add_argument("--batch-size", type=int, default=32)
@@ -41,6 +47,9 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    if args.init_checkpoint is not None and args.supcon_checkpoint is not None:
+        raise ValueError("Use either --init-checkpoint or --supcon-checkpoint, not both.")
+
     set_seed(args.seed)
     device = get_device(args.device)
     dataset_root = find_dataset_root(args.data_dir)
@@ -64,6 +73,11 @@ def main() -> None:
         freeze_backbone=args.freeze_backbone,
         dropout=args.dropout,
     )
+    if args.init_checkpoint is not None:
+        checkpoint = torch.load(args.init_checkpoint, map_location="cpu", weights_only=False)
+        load_result = model.load_state_dict(checkpoint["model_state_dict"], strict=True)
+        print(f"Initialized classifier from {args.init_checkpoint}: {load_result}")
+
     if args.supcon_checkpoint is not None:
         load_result = load_supcon_encoder(model, args.supcon_checkpoint, strict=False)
         print(f"Loaded SupCon encoder from {args.supcon_checkpoint}: {load_result}")
@@ -167,4 +181,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

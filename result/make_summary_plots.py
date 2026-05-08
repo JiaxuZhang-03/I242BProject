@@ -27,6 +27,7 @@ DISPLAY_NAMES = {
     "simple_cnn_128_e5": "Simple CNN",
     "simple_cnn_supcon_finetune_128_e5": "Simple CNN + SupCon",
     "resnet18_pretrained_frozen_128_e5": "ResNet18 pretrained",
+    "resnet18_unfrozen_from_frozen_lr3e-5_128_e8": "ResNet18 fine-tuned",
 }
 
 
@@ -125,7 +126,7 @@ def plot_val_test_accuracy(summary: pd.DataFrame, output_dir: Path) -> Path:
     axis.set_title("Validation-to-test comparison")
     axis.set_xlabel("")
     axis.set_ylabel("Accuracy")
-    axis.set_ylim(0.72, 0.92)
+    axis.set_ylim(0.72, 1.0)
     annotate_bars(axis)
     plt.xticks(rotation=12, ha="right")
     plt.tight_layout()
@@ -281,4 +282,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

@@ -16,6 +16,8 @@ Optional environment variables:
   SUPCON_BATCH_SIZE       Batch size for SupCon pretraining. Default: 64
   EVAL_BATCH_SIZE         Batch size for evaluation. Default: 64
   CLASSIFIER_EPOCHS       Epochs for classifier training. Default: 5
+  FINETUNE_EPOCHS         Epochs for full ResNet18 fine-tuning. Default: 8
+  FINETUNE_LR             Learning rate for full ResNet18 fine-tuning. Default: 3e-5
   SUPCON_EPOCHS           Epochs for SupCon pretraining. Default: 5
   NUM_WORKERS             DataLoader workers. Default: 0
   GRADCAM_IMAGES          Number of Grad-CAM examples. Default: 12
@@ -41,12 +43,15 @@ CLASSIFIER_BATCH_SIZE="${CLASSIFIER_BATCH_SIZE:-32}"
 SUPCON_BATCH_SIZE="${SUPCON_BATCH_SIZE:-64}"
 EVAL_BATCH_SIZE="${EVAL_BATCH_SIZE:-64}"
 CLASSIFIER_EPOCHS="${CLASSIFIER_EPOCHS:-5}"
+FINETUNE_EPOCHS="${FINETUNE_EPOCHS:-8}"
+FINETUNE_LR="${FINETUNE_LR:-3e-5}"
 SUPCON_EPOCHS="${SUPCON_EPOCHS:-5}"
 NUM_WORKERS="${NUM_WORKERS:-0}"
 GRADCAM_IMAGES="${GRADCAM_IMAGES:-12}"
 
 SIMPLE_RUN="simple_cnn_${IMAGE_SIZE}_e${CLASSIFIER_EPOCHS}"
 RESNET_RUN="resnet18_pretrained_frozen_${IMAGE_SIZE}_e${CLASSIFIER_EPOCHS}"
+RESNET_FT_RUN="resnet18_unfrozen_from_frozen_lr${FINETUNE_LR}_${IMAGE_SIZE}_e${FINETUNE_EPOCHS}"
 SUPCON_RUN="simple_cnn_supcon_${IMAGE_SIZE}_e${SUPCON_EPOCHS}"
 SUPCON_FT_RUN="simple_cnn_supcon_finetune_${IMAGE_SIZE}_e${CLASSIFIER_EPOCHS}"
 
@@ -62,6 +67,8 @@ printf 'Repository: %s\n' "${REPO_ROOT}"
 printf 'Python: %s\n' "${PYTHON_BIN}"
 printf 'Image size: %s\n' "${IMAGE_SIZE}"
 printf 'Classifier epochs: %s\n' "${CLASSIFIER_EPOCHS}"
+printf 'ResNet18 fine-tune epochs: %s\n' "${FINETUNE_EPOCHS}"
+printf 'ResNet18 fine-tune LR: %s\n' "${FINETUNE_LR}"
 printf 'SupCon epochs: %s\n' "${SUPCON_EPOCHS}"
 printf 'Num workers: %s\n' "${NUM_WORKERS}"
 
@@ -94,6 +101,18 @@ run_step "Train pretrained frozen ResNet18" \
     --num-workers "${NUM_WORKERS}" \
     --patience 3 \
     --experiment-name "${RESNET_RUN}"
+
+run_step "Fine-tune full ResNet18 from frozen checkpoint" \
+  "${PYTHON_BIN}" src/train_classifier.py \
+    --model-name resnet18 \
+    --init-checkpoint "result/classifier/${RESNET_RUN}/best_model.pt" \
+    --image-size "${IMAGE_SIZE}" \
+    --batch-size "${CLASSIFIER_BATCH_SIZE}" \
+    --epochs "${FINETUNE_EPOCHS}" \
+    --lr "${FINETUNE_LR}" \
+    --num-workers "${NUM_WORKERS}" \
+    --patience 4 \
+    --experiment-name "${RESNET_FT_RUN}"
 
 run_step "Run supervised contrastive pretraining" \
   "${PYTHON_BIN}" src/pretrain_supcon.py \
@@ -131,6 +150,14 @@ run_step "Evaluate pretrained frozen ResNet18" \
     --num-workers "${NUM_WORKERS}" \
     --output-dir "result/evaluation/${RESNET_RUN}"
 
+run_step "Evaluate fine-tuned ResNet18" \
+  "${PYTHON_BIN}" src/evaluate_model.py \
+    --checkpoint "result/classifier/${RESNET_FT_RUN}/best_model.pt" \
+    --split test \
+    --batch-size "${EVAL_BATCH_SIZE}" \
+    --num-workers "${NUM_WORKERS}" \
+    --output-dir "result/evaluation/${RESNET_FT_RUN}"
+
 run_step "Evaluate SupCon fine-tuned classifier" \
   "${PYTHON_BIN}" src/evaluate_model.py \
     --checkpoint "result/classifier/${SUPCON_FT_RUN}/best_model.pt" \
@@ -141,10 +168,10 @@ run_step "Evaluate SupCon fine-tuned classifier" \
 
 run_step "Generate Grad-CAM examples for the strongest default model" \
   "${PYTHON_BIN}" src/make_gradcam.py \
-    --checkpoint "result/classifier/${RESNET_RUN}/best_model.pt" \
+    --checkpoint "result/classifier/${RESNET_FT_RUN}/best_model.pt" \
     --split test \
     --num-images "${GRADCAM_IMAGES}" \
-    --output-dir "result/gradcam/${RESNET_RUN}"
+    --output-dir "result/gradcam/${RESNET_FT_RUN}"
 
 run_step "Build experiment summary tables" \
   "${PYTHON_BIN}" src/summarize_results.py
