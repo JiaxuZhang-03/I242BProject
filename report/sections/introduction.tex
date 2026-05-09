@@ -1,0 +1,26 @@
+\section{Introduction}
+
+Image-based food classification is a practical visual recognition problem in which object appearance, plating context, and class definitions can all introduce ambiguity. This project studies a binary version of the task: each image is assigned to either \Healthy{} or \Unhealthy{}. The goal is not to claim nutritional ground truth beyond the dataset labels, but to evaluate whether modern transfer learning methods can produce reliable predictions under a fixed train/validation/test protocol.
+
+The project is organized as an incremental empirical study. It begins with exploratory data analysis and a compact convolutional neural network (CNN) baseline, then compares the baseline with ImageNet-pretrained ResNet18 transfer learning. The transfer model is evaluated both with a frozen feature extractor and with subsequent fine-tuning. A supervised contrastive learning branch is also included to test whether label-aware representation learning improves the small CNN encoder. Finally, the strongest ResNet18 configuration is examined through a focused ablation and an error analysis of held-out test predictions. The repository \texttt{README.md} documents the pipeline commands, generated artifacts, and reproduction workflow used to produce the summaries cited in this paper \citep{projectreadme}. Team collaboration and code versioning were managed through GitHub at \url{https://github.com/JiaxuZhang-03/I242BProject} \citep{projectrepo}.
+
+The current dataset contains 5,222 images with balanced class counts in all splits: 4,178 training images, 522 validation images, and 522 test images. Because the two classes are balanced, accuracy, macro F1, and weighted F1 are directly comparable for the main evaluation. The best model observed in the generated results is a fully fine-tuned ResNet18 initialized from a frozen-transfer checkpoint. It reaches \(0.9617\) test accuracy and \(0.9944\) ROC AUC, improving substantially over both the simple CNN baseline and the frozen-backbone transfer model.
+
+\Cref{fig:dataset-overview} shows the split-level class counts and a sample grid generated during exploratory analysis.
+
+\begin{figure}[t]
+  \centering
+  \begin{subfigure}[t]{0.43\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{dataset_counts.png}
+    \caption{Class counts by split.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.53\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{sample_grid_train.png}
+    \caption{Training-set examples.}
+  \end{subfigure}
+  \caption{Exploratory data analysis artifacts from \texttt{result/eda}. The dataset is balanced across \Healthy{} and \Unhealthy{} labels in the training, validation, and test splits.}
+  \label{fig:dataset-overview}
+\end{figure}

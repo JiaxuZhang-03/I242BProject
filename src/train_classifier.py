@@ -26,6 +26,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--pretrained", action="store_true")
     parser.add_argument("--freeze-backbone", action="store_true")
     parser.add_argument(
+        "--trainable-backbone",
+        choices=("all", "none", "resnet-layer4", "resnet-layer3-layer4"),
+        default="all",
+        help="Optional partial-backbone fine-tuning policy. Classifier head remains trainable.",
+    )
+    parser.add_argument(
         "--init-checkpoint",
         type=Path,
         default=None,
@@ -43,6 +49,31 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--device", type=str, default="auto")
     return parser.parse_args()
+
+
+def configure_trainable_backbone(model: nn.Module, policy: str) -> None:
+    if policy == "all":
+        return
+
+    for parameter in model.encoder.parameters():
+        parameter.requires_grad = False
+
+    if policy == "none":
+        return
+
+    layer_names = {
+        "resnet-layer4": ("layer4",),
+        "resnet-layer3-layer4": ("layer3", "layer4"),
+    }[policy]
+    missing_layers = [name for name in layer_names if not hasattr(model.encoder, name)]
+    if missing_layers:
+        raise ValueError(
+            f"Policy {policy!r} requires ResNet-style layers, missing {missing_layers}."
+        )
+
+    for name in layer_names:
+        for parameter in getattr(model.encoder, name).parameters():
+            parameter.requires_grad = True
 
 
 def main() -> None:
@@ -81,6 +112,10 @@ def main() -> None:
     if args.supcon_checkpoint is not None:
         load_result = load_supcon_encoder(model, args.supcon_checkpoint, strict=False)
         print(f"Loaded SupCon encoder from {args.supcon_checkpoint}: {load_result}")
+
+    if args.freeze_backbone and args.trainable_backbone == "all":
+        args.trainable_backbone = "none"
+    configure_trainable_backbone(model, args.trainable_backbone)
 
     model.to(device)
     criterion = nn.CrossEntropyLoss()

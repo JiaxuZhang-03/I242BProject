@@ -1,0 +1,4 @@
+$pdf_mode = 5;
+$xelatex = 'xelatex -interaction=nonstopmode -file-line-error %O %S';
+$bibtex_use = 2;
+$clean_ext = 'aux bbl blg fls fdb_latexmk log out synctex.gz';

@@ -28,6 +28,25 @@ result/.matplotlib/
 result/.torch/
 result/**/*.pt
 
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.nav
+*.out
+*.snm
+*.synctex.gz
+*.toc
+*.xdv
+report/main.pdf
+
+# Local scratch/reference material
+scratch/
+UC_Berkeley_Beamer_Theme__1_/
+
 # OS / editor files
 .DS_Store
 .vscode/

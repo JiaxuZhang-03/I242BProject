@@ -1,0 +1,60 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{fontspec}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{fancyvrb}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[colorlinks=true,linkcolor=blue!45!black,citecolor=blue!45!black,urlcolor=blue!45!black]{hyperref}
+\usepackage[nameinlink,capitalise,noabbrev]{cleveref}
+
+\graphicspath{
+  {figures/}
+  {../result/summary_plots/}
+  {../result/eda/}
+  {../result/evaluation/resnet18_unfrozen_from_frozen_lr1e-4_128_e8/test_20260508_104533/}
+  {../result/gradcam/resnet18_unfrozen_from_frozen_lr1e-4_128_e8/gradcam_20260508_104648/}
+}
+
+\sisetup{
+  round-mode=places,
+  round-precision=4,
+  table-number-alignment=center
+}
+
+\title{Transfer Learning and Error Analysis for Binary Food Image Classification}
+\author{Xutong Dong \and Zhaoning Liang \and Yirong Li \and Jiaxu Zhang}
+\date{May 2026}
+
+\newcommand{\Healthy}{\textsc{healthy}}
+\newcommand{\Unhealthy}{\textsc{unhealthy}}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This paper summarizes a reproducible binary food image classification study that distinguishes \Healthy{} and \Unhealthy{} food images. The project compares a small convolutional neural network trained from scratch, an ImageNet-pretrained ResNet18 with a frozen backbone, fully fine-tuned ResNet18 variants, and a supervised contrastive pretraining branch. On a balanced held-out test set of 522 images, the best observed model is a ResNet18 initialized from a frozen-transfer checkpoint and fully fine-tuned with learning rate \(10^{-4}\), achieving \(0.9617\) accuracy, \(0.9617\) macro F1, and \(0.9944\) ROC AUC. A focused ablation indicates that adapting high-level ResNet features accounts for most of the improvement over a frozen backbone, while full-backbone fine-tuning at the largest tested learning rate performs best. Error analysis shows 20 residual test errors, split evenly across the two classes.
+\end{abstract}
+
+\input{sections/introduction}
+\input{sections/related_work}
+\input{sections/method}
+\input{sections/experiments}
+\input{sections/safety_ethics}
+\input{sections/conclusion}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\appendix
+\input{sections/appendix}
+
+\end{document}

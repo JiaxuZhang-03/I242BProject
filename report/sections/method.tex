@@ -1,0 +1,64 @@
+\section{Method}
+
+\subsection{Problem Setup}
+
+Let \(\mathcal{D}=\{(x_i,y_i)\}_{i=1}^{n}\) denote the image dataset, where \(x_i\) is an RGB food image and \(y_i \in \{0,1\}\) indicates the class label. The model produces logits \(z_i=f_\theta(x_i)\in\mathbb{R}^{2}\), and class probabilities are computed by
+\begin{equation}
+  p_\theta(y=c\mid x_i)=\frac{\exp(z_{ic})}{\sum_{k=1}^{2}\exp(z_{ik})}.
+\end{equation}
+Classifier training minimizes the regularized empirical risk
+\begin{equation}
+  \min_{\theta}\;
+  \frac{1}{n}\sum_{i=1}^{n}
+  L_{\mathrm{ce}}\!\left(f_\theta(x_i),y_i\right)
+  +\lambda\lVert\theta_{\mathrm{train}}\rVert_2^2,
+\end{equation}
+where \(L_{\mathrm{ce}}\) is cross-entropy and \(\theta_{\mathrm{train}}\) denotes the parameters updated in a given experiment. In implementation, the \(L_2\)-style penalty is applied through AdamW weight decay. Dropout in the classifier head, data augmentation, cosine learning-rate decay, and validation-based early stopping provide additional regularization.
+
+\subsection{Data Processing}
+
+The project uses an ImageFolder-style directory layout with separate \texttt{train}, \texttt{val}, and \texttt{test} folders. Images are resized to \(128\times128\) pixels for the current reported experiments. Training uses random resized crops, horizontal flips, and color jitter. Validation and test evaluation use deterministic resizing followed by center cropping. All images are normalized using ImageNet channel statistics, which is appropriate for the pretrained ResNet18 branch.
+
+\begin{table}[t]
+  \centering
+  \caption{Dataset split sizes from \texttt{result/eda/dataset\_counts.csv}.}
+  \label{tab:dataset}
+  \begin{tabular}{lrrr}
+    \toprule
+    Split & Healthy & Unhealthy & Total \\
+    \midrule
+    Train & 2089 & 2089 & 4178 \\
+    Validation & 261 & 261 & 522 \\
+    Test & 261 & 261 & 522 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Models}
+
+The simple CNN baseline uses four convolutional blocks with batch normalization, ReLU activations, and max pooling in the first three blocks. Adaptive average pooling converts the final feature map into a 256-dimensional feature vector. A dropout layer and linear classifier map this feature vector to two logits.
+
+The transfer-learning models use a ResNet18 backbone. In the frozen-backbone configuration, ImageNet weights initialize the encoder and only the final binary classification head is trained. In the fine-tuning configurations, the model is initialized from the frozen-transfer checkpoint and then trained with either only ResNet \texttt{layer4} unfrozen or the full backbone unfrozen. The ablation varies the trainable scope and learning rate.
+
+\subsection{Advanced Extension: Supervised Contrastive Branch}
+
+The advanced methodological extension in this project is supervised contrastive pretraining, which is evaluated as a representation-learning alternative to direct cross-entropy training. For this branch, each training image is transformed into two augmented views. Let \(u_i\) and \(v_i\) denote normalized projected embeddings. The supervised contrastive loss encourages embeddings with the same label to have high cosine similarity and embeddings with different labels to have lower similarity:
+\begin{equation}
+  \mathcal{L}_{\mathrm{supcon}}
+  =
+  \sum_{i}
+  \frac{-1}{|P(i)|}
+  \sum_{p\in P(i)}
+  \log
+  \frac{\exp(\operatorname{sim}(u_i,v_p)/\tau)}
+       {\sum_{a\neq i}\exp(\operatorname{sim}(u_i,v_a)/\tau)},
+\end{equation}
+where \(P(i)\) is the set of same-label positives for anchor \(i\), \(\operatorname{sim}(\cdot,\cdot)\) is cosine similarity after normalization, and \(\tau=0.07\) in the current implementation. The pretrained encoder is then reused in a classifier and fine-tuned with cross-entropy.
+
+\subsection{Evaluation}
+
+Each classifier is evaluated on the held-out test set. The generated summaries report accuracy, macro F1, weighted F1, and ROC AUC. For binary classification, the confusion matrix is
+\begin{equation}
+  C_{ab}=\left|\{i:y_i=a,\hat{y}_i=b\}\right|,
+\end{equation}
+where \(a\) is the true class and \(b\) is the predicted class. Error analysis additionally records misclassified samples, predicted-class confidence, class-specific error rates, and high-confidence errors.

@@ -1,0 +1,9 @@
+\section{Related Work}
+
+Convolutional neural networks remain a standard architecture family for image recognition because they combine local receptive fields with hierarchical feature learning. Residual networks improve optimization by introducing skip connections, which allow deeper CNNs to learn residual mappings rather than entirely new transformations at each layer \citep{he2016deep}. In this project, ResNet18 is used as a computationally modest transfer-learning backbone.
+
+Transfer learning is especially useful when task-specific datasets are smaller than the datasets used to train general-purpose visual encoders. ImageNet pretraining provides features learned from a large and diverse image collection \citep{deng2009imagenet}. The project evaluates two common transfer-learning regimes: training only a new classification head while freezing the backbone, and unfreezing part or all of the pretrained backbone for task-specific fine-tuning.
+
+The supervised contrastive learning branch follows the idea that examples sharing a label should be close in representation space, while examples from different labels should be separated \citep{khosla2020supervised}. This objective is tested as an alternative representation-learning strategy for the simple CNN encoder. The resulting encoder is then fine-tuned for binary classification.
+
+For interpretability, the project generates Grad-CAM visualizations \citep{selvaraju2017gradcam}. These maps are not treated as causal explanations, but they provide a qualitative check on which image regions influence the selected ResNet18 model. The implementation uses PyTorch for training and evaluation \citep{paszke2019pytorch}, AdamW for optimization \citep{loshchilov2019decoupled}, and standard image augmentations consistent with modern CNN training practice \citep{szegedy2016rethinking}.

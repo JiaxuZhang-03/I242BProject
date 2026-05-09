@@ -1,0 +1,5 @@
+\section{Conclusion}
+
+This project demonstrates that transfer learning is the dominant performance driver for the binary food image classification task studied here. A simple CNN trained from scratch reaches \(0.8027\) test accuracy, while a frozen ImageNet-pretrained ResNet18 improves to \(0.8697\). Fine-tuning the pretrained ResNet18 provides the largest gain, with the best current configuration reaching \(0.9617\) test accuracy and \(0.9944\) ROC AUC.
+
+The ablation suggests that adapting high-level residual features is already sufficient to capture much of the improvement, but full-backbone fine-tuning with learning rate \(10^{-4}\) performs best among the tested settings. The final error analysis shows balanced residual errors across \Healthy{} and \Unhealthy{} classes, with several high-confidence mistakes that warrant qualitative review. Future work should avoid reporting speculative gains and instead extend the present pipeline with new generated summaries for longer training, alternative backbones, calibration analysis, or evaluation on an independently collected dataset.

@@ -1,0 +1,31 @@
+\section{Code and Reproducibility}
+
+The project code is organized as executable scripts and reusable modules. The repository \texttt{README.md} documents the full workflow. The team used GitHub for code collaboration, version control, and project sharing: \url{https://github.com/JiaxuZhang-03/I242BProject}.
+
+\begin{itemize}[leftmargin=*]
+  \item \texttt{src/train\_classifier.py}: classifier training, transfer learning, checkpoint initialization, and fine-tuning policies.
+  \item \texttt{src/pretrain\_supcon.py}: supervised contrastive pretraining.
+  \item \texttt{src/evaluate\_model.py}: held-out evaluation, metrics, predictions, ROC curves, and confusion matrices.
+  \item \texttt{src/error\_analysis.py}: residual error summaries and high-confidence error analysis.
+  \item \texttt{src/food\_project/models.py}: simple CNN, ResNet18 classifier wrappers, and SupCon projection head.
+  \item \texttt{src/food\_project/data.py}: dataset discovery, transformations, dataloaders, and split summaries.
+\end{itemize}
+
+\noindent From the repository root, the complete pipeline can be reproduced with:
+
+\begin{Verbatim}[fontsize=\small]
+./download_data.sh
+./setup_environment.sh
+./run_full_pipeline.sh
+./run_resnet_ablation.sh
+\end{Verbatim}
+
+\noindent Representative source excerpts are included below; the complete implementation is in the repository.
+
+\subsection{Model Definition Excerpt}
+
+\VerbatimInput[fontsize=\scriptsize,firstline=23,lastline=76]{../src/food_project/models.py}
+
+\subsection{Fine-Tuning Policy Excerpt}
+
+\VerbatimInput[fontsize=\scriptsize,firstline=53,lastline=85]{../src/train_classifier.py}

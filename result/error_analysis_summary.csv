@@ -1,0 +1,2 @@
+experiment,predictions_csv,total_samples,num_errors,accuracy,mean_error_confidence,median_error_confidence,high_confidence_errors_0.80,classes
+resnet18_unfrozen_from_frozen_lr1e-4_128_e8,/Users/littleotter/Desktop/I242BProject/result/evaluation/resnet18_unfrozen_from_frozen_lr1e-4_128_e8/test_20260508_104533/predictions.csv,522,20,0.9616858237547893,0.7842940092086792,0.826317697763443,12,"['healthy', 'unhealthy']"

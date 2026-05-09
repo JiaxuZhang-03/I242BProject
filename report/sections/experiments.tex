@@ -1,0 +1,146 @@
+\section{Experiments}
+
+\subsection{Training Protocol}
+
+All reported model runs use \(128\times128\) inputs and the balanced train/validation/test split in \cref{tab:dataset}. Classifiers are optimized with AdamW and cosine learning-rate scheduling. The baseline simple CNN, frozen ResNet18, and SupCon fine-tuned classifier are trained for five epochs in the current summary. ResNet18 fine-tuning runs for up to eight epochs, with early stopping available in the training script.
+
+\begin{table}[t]
+  \centering
+  \caption{Held-out test results from \texttt{result/experiment\_summary.csv}.}
+  \label{tab:main-results}
+  \begin{tabular}{lS[table-format=1.4]S[table-format=1.4]S[table-format=1.4]S[table-format=1.4]}
+    \toprule
+    Experiment & {Best val. acc.} & {Test acc.} & {Macro F1} & {ROC AUC} \\
+    \midrule
+    ResNet18 full fine-tune, LR \(10^{-4}\) & 0.9655 & 0.9617 & 0.9617 & 0.9944 \\
+    ResNet18 layer4 fine-tune, LR \(3\times10^{-5}\) & 0.9540 & 0.9406 & 0.9406 & 0.9850 \\
+    ResNet18 full fine-tune, LR \(3\times10^{-5}\) & 0.9598 & 0.9406 & 0.9406 & 0.9845 \\
+    ResNet18 full fine-tune, LR \(10^{-5}\) & 0.9406 & 0.9310 & 0.9310 & 0.9781 \\
+    ResNet18 frozen backbone & 0.8563 & 0.8697 & 0.8697 & 0.9344 \\
+    Simple CNN + SupCon fine-tune & 0.8084 & 0.8046 & 0.8033 & 0.8813 \\
+    Simple CNN baseline & 0.7989 & 0.8027 & 0.8027 & 0.8869 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\Cref{tab:main-results} shows that ImageNet transfer improves substantially over the simple CNN baseline, and that full ResNet18 fine-tuning gives the strongest result. The best model improves test accuracy from \(0.8697\) for the frozen-backbone ResNet18 to \(0.9617\), an absolute gain of \(0.0920\). It also improves ROC AUC from \(0.9344\) to \(0.9944\).
+
+\begin{figure}[t]
+  \centering
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{training_loss_curves.png}
+    \caption{Training and validation loss.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{training_accuracy_curves.png}
+    \caption{Training and validation accuracy.}
+  \end{subfigure}
+  \caption{Optimization diagnostics generated from the saved history files.}
+  \label{fig:training-diagnostics}
+\end{figure}
+
+\Cref{fig:training-diagnostics} provides the main bias--variance diagnostic. The simple CNN and SupCon-initialized simple CNN remain below the ResNet18 variants, suggesting that the compact encoder underfits the task relative to the transferred residual backbone. The best full fine-tuned ResNet18 reaches high training accuracy while validation accuracy continues to improve through the final epoch, so the saved curves do not show severe validation collapse. The gap between training and validation loss nevertheless grows during fine-tuning, which indicates that regularization and validation monitoring remain important for this dataset.
+
+\begin{figure}[t]
+  \centering
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{model_metric_comparison.png}
+    \caption{Model metric comparison.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{validation_vs_test_accuracy.png}
+    \caption{Validation and test accuracy.}
+  \end{subfigure}
+  \caption{Summary plots generated from the experiment outputs in \texttt{result/summary\_plots}.}
+  \label{fig:model-summary}
+\end{figure}
+
+\subsection{Ablation}
+
+The ResNet18 ablation separates the effects of initialization, trainable scope, and learning rate. Training only the classifier head provides a useful transfer baseline but reaches only \(0.8697\) test accuracy. Unfreezing ResNet \texttt{layer4} raises accuracy to \(0.9406\), indicating that high-level feature adaptation explains much of the gain. Full-backbone fine-tuning is sensitive to the learning rate: \(10^{-5}\) under-adapts in the current run, \(3\times10^{-5}\) matches the layer4 setting, and \(10^{-4}\) achieves the best test accuracy.
+
+\begin{table}[t]
+  \centering
+  \caption{Focused ResNet18 fine-tuning ablation from \texttt{result/ablation\_summary.csv}.}
+  \label{tab:ablation}
+  \begin{tabular}{llS[table-format=1.5]S[table-format=1.4]S[table-format=1.4]r}
+    \toprule
+    Setting & Trainable scope & {LR} & {Test acc.} & {ROC AUC} & {Trainable params} \\
+    \midrule
+    Frozen head & classifier head & 0.001 & 0.8697 & 0.9344 & 1026 \\
+    Layer4 fine-tune & classifier + layer4 & 0.00003 & 0.9406 & 0.9850 & 8394754 \\
+    Full fine-tune & full backbone & 0.00001 & 0.9310 & 0.9781 & 11177538 \\
+    Full fine-tune & full backbone & 0.00003 & 0.9406 & 0.9845 & 11177538 \\
+    Full fine-tune & full backbone & 0.0001 & 0.9617 & 0.9944 & 11177538 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[t]
+  \centering
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{resnet18_ablation_accuracy.png}
+    \caption{Ablation accuracy.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{resnet18_ablation_lr_sensitivity.png}
+    \caption{Learning-rate sensitivity.}
+  \end{subfigure}
+  \caption{ResNet18 ablation plots generated from \texttt{result/ablation\_summary.csv}.}
+  \label{fig:ablation}
+\end{figure}
+
+\subsection{Error Analysis}
+
+The best model makes 20 errors on 522 test images. Errors are balanced across classes: 10 \Healthy{} images are predicted as \Unhealthy{}, and 10 \Unhealthy{} images are predicted as \Healthy{}. The resulting confusion matrix is shown in \cref{tab:confusion}. The mean predicted-class confidence among errors is \(0.7843\), and 12 of the 20 errors have confidence at least \(0.80\). These high-confidence failures are useful targets for qualitative inspection because they are not simply low-confidence borderline predictions.
+
+\begin{table}[t]
+  \centering
+  \caption{Confusion matrix for the best ResNet18 model on the test set.}
+  \label{tab:confusion}
+  \begin{tabular}{lrr}
+    \toprule
+    True class & Predicted healthy & Predicted unhealthy \\
+    \midrule
+    Healthy & 251 & 10 \\
+    Unhealthy & 10 & 251 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[t]
+  \centering
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{test_confusion_matrices.png}
+    \caption{Test confusion matrices.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[t]{0.48\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{error_confidence_histogram.png}
+    \caption{Confidence of residual errors.}
+  \end{subfigure}
+  \caption{Evaluation and error-analysis plots from \texttt{result/summary\_plots}.}
+  \label{fig:error-analysis}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.8\linewidth]{009_img_51f7253d21_gradcam.png}
+  \caption{Example Grad-CAM artifact for the selected ResNet18 model. Additional Grad-CAM images are stored under \texttt{result/gradcam}. This figure is qualitative and is not used as quantitative evidence.}
+  \label{fig:gradcam}
+\end{figure}
+
+\subsection{Missing or Future Results}
+
+The repository contains the main summaries, ablation outputs, error-analysis tables, and visual artifacts needed for the current report. Additional experiments, such as longer SupCon pretraining, larger backbones, confidence calibration, or cross-dataset validation, have not been run in the provided artifacts. For that reason, this report does not claim results for those extensions.

@@ -27,7 +27,10 @@ DISPLAY_NAMES = {
     "simple_cnn_128_e5": "Simple CNN",
     "simple_cnn_supcon_finetune_128_e5": "Simple CNN + SupCon",
     "resnet18_pretrained_frozen_128_e5": "ResNet18 pretrained",
-    "resnet18_unfrozen_from_frozen_lr3e-5_128_e8": "ResNet18 fine-tuned",
+    "resnet18_layer4_from_frozen_lr3e-5_128_e8": "ResNet18 layer4",
+    "resnet18_unfrozen_from_frozen_lr1e-5_128_e8": "ResNet18 full LR 1e-5",
+    "resnet18_unfrozen_from_frozen_lr3e-5_128_e8": "ResNet18 full LR 3e-5",
+    "resnet18_unfrozen_from_frozen_lr1e-4_128_e8": "ResNet18 full LR 1e-4",
 }
 
 
@@ -82,7 +85,7 @@ def plot_metric_comparison(summary: pd.DataFrame, output_dir: Path) -> Path:
     }
     plot_frame["metric"] = plot_frame["metric"].map(metric_labels)
 
-    plt.figure(figsize=(10, 5))
+    plt.figure(figsize=(max(10, 1.55 * summary["display_name"].nunique()), 5))
     axis = sns.barplot(
         data=plot_frame,
         x="display_name",
@@ -115,7 +118,7 @@ def plot_val_test_accuracy(summary: pd.DataFrame, output_dir: Path) -> Path:
         {"best_val_acc": "Best validation", "test_accuracy": "Test"}
     )
 
-    plt.figure(figsize=(9, 5))
+    plt.figure(figsize=(max(9, 1.5 * summary["display_name"].nunique()), 5))
     axis = sns.barplot(
         data=plot_frame,
         x="display_name",

@@ -1,0 +1,101 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=0.8in]{geometry}
+\usepackage{fontspec}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue!45!black,urlcolor=blue!45!black]{hyperref}
+
+\setmainfont{lmroman10-regular.otf}[
+  BoldFont=lmroman10-bold.otf,
+  ItalicFont=lmroman10-italic.otf,
+  BoldItalicFont=lmroman10-bolditalic.otf
+]
+
+\definecolor{BerkeleyBlue}{HTML}{003262}
+\definecolor{Medalist}{HTML}{C4820E}
+
+\newcommand{\parthead}[4]{%
+  \section*{\textcolor{BerkeleyBlue}{#1: #2}}%
+  \noindent\textbf{Presenter:} #3 \hfill \textbf{Slides:} #4%
+  \par\vspace{0.4em}\hrule\vspace{0.8em}
+}
+
+\title{\textcolor{BerkeleyBlue}{Presentation Draft and Speaker Assignment}}
+\author{Transfer Learning for Binary Food Image Classification}
+\date{INDENG 1/242B Spring 2026 \quad May 2026}
+
+\begin{document}
+\maketitle
+
+\section*{Slide Assignment Overview}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{llll}
+\toprule
+Part & Presenter & Slides & Approx. Time \\
+\midrule
+p1 & Xutong Dong & Slides 1--3 & 2--3 min \\
+p2 & Zhaoning Liang & Slides 4--5 & 2--3 min \\
+p3 & Yirong Li & Slides 6--8 & 2--3 min \\
+p4 & Jiaxu Zhang & Slides 9--10 & 2--3 min \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent This draft is written for a roughly 10-minute team presentation. The wording can be spoken naturally rather than read word-for-word.
+
+\parthead{p1}{Motivation, Problem Setup, and Data}{Xutong Dong}{Slides 1--3}
+
+\textbf{Slide 1: Title.}
+Good [morning/afternoon], everyone. We are presenting our INDENG 1/242B project, \emph{Transfer Learning for Binary Food Image Classification}. Our team members are Xutong Dong, Zhaoning Liang, Yirong Li, and Jiaxu Zhang. The project studies whether modern transfer learning methods can improve a practical image classification task: distinguishing healthy and unhealthy food images.
+
+\textbf{Slide 2: Motivation and learning problem.}
+The use case is coarse food-image screening. Given an RGB food image, our model predicts one of two labels: healthy or unhealthy. This is a supervised learning problem where the input is an image \(x\), the label is \(y\), and the model learns a mapping \(f_\theta(x)\rightarrow y\). Our main motivation is to compare a small task-specific CNN against transfer learning with an ImageNet-pretrained ResNet18. We ask four questions: how strong is the CNN baseline, how much ImageNet transfer helps, whether fine-tuning improves the transferred model, and what errors remain after selecting the best model.
+
+\textbf{Slide 3: Dataset and preprocessing.}
+The dataset contains 5,222 images. It is balanced across all splits: the training set has 4,178 images, and both validation and test sets have 522 images. Each split has equal numbers of healthy and unhealthy samples. This balance is useful because accuracy, macro F1, and weighted F1 are directly comparable. For preprocessing, images are resized to \(128\times128\). During training, we use random crops, horizontal flips, and color jitter for augmentation. During validation and testing, we use deterministic resizing and center cropping. Since our transfer model uses ImageNet-pretrained weights, we normalize images with ImageNet channel statistics.
+
+\textbf{Transition to p2.}
+Next, Zhaoning will describe the model architectures, training objective, and experimental pipeline.
+
+\parthead{p2}{Methodology and Experimental Pipeline}{Zhaoning Liang}{Slides 4--5}
+
+\textbf{Slide 4: Methodology.}
+We compare several modeling choices. First, the baseline is a simple CNN with convolution, batch normalization, ReLU activations, max pooling, adaptive average pooling, dropout, and a final linear classifier. Second, we use a frozen ResNet18 transfer model: the ImageNet-pretrained encoder is fixed, and only the binary classification head is trained. Third, we fine-tune ResNet18, either by unfreezing only the last residual block, layer4, or by unfreezing the full backbone.
+
+The classifier outputs logits, which are converted to class probabilities using softmax. The training objective is regularized empirical risk: average cross-entropy loss plus an \(L_2\)-style regularization term on trainable parameters. In implementation, we use AdamW, which decouples weight decay from the optimizer update. We also use dropout, data augmentation, cosine learning-rate decay, and validation-based checkpointing. As an advanced component beyond the basic CNN setup, we also implement supervised contrastive pretraining, where same-label examples are encouraged to have closer embeddings before classifier fine-tuning.
+
+\textbf{Slide 5: Experimental pipeline.}
+Our pipeline starts with exploratory data analysis and preprocessing. Then we train the simple CNN baseline. Next, we train the frozen ImageNet-pretrained ResNet18. After that, we run partial and full fine-tuning experiments to see how much task-specific adaptation helps. We also include the supervised contrastive representation-learning branch. Finally, we evaluate all models using held-out metrics, training and validation curves, confusion matrices, ROC AUC, Grad-CAM, and error analysis. This pipeline is designed to cover the project requirements: problem formulation, network design, objective, optimizer, regularization, advanced methodology, and diagnostic evaluation.
+
+\textbf{Transition to p3.}
+Now Yirong will walk through the training diagnostics, main results, ablation, and error analysis.
+
+\parthead{p3}{Diagnostics, Results, and Error Analysis}{Yirong Li}{Slides 6--8}
+
+\textbf{Slide 6: Training and validation diagnostics.}
+This slide shows the training and validation loss and accuracy curves. The simple CNN variants remain noticeably below the ResNet18 models, which suggests that the small CNN underfits compared with the transferred residual backbone. For the best fine-tuned ResNet18, validation accuracy continues improving through the final epoch, so we do not see a severe validation collapse. However, the training-validation gap grows during fine-tuning, which means regularization and validation monitoring are still important. Overall, the curves support the conclusion that transfer learning gives a better representation for this dataset.
+
+\textbf{Slide 7: Main results.}
+The strongest model is the full ResNet18 fine-tuned from the frozen checkpoint with learning rate \(10^{-4}\). It achieves 0.9617 test accuracy, 0.9617 macro F1, and 0.9944 ROC AUC. The simple CNN baseline reaches 0.8027 test accuracy. The frozen ResNet18 transfer model reaches 0.8697, already improving substantially over the CNN. Full fine-tuning then improves test accuracy from 0.8697 to 0.9617, which is a 9.20 percentage point absolute gain over frozen transfer. This suggests that ImageNet features are useful, but adapting the backbone to the food dataset is the largest performance driver.
+
+\textbf{Slide 8: Ablation and error analysis.}
+The ablation separates the effect of trainable scope and learning rate. Training only the frozen ResNet18 classifier head reaches 0.8697 test accuracy. Unfreezing layer4 reaches 0.9406, showing that adapting high-level semantic features explains much of the gain. Full fine-tuning with learning rate \(10^{-4}\) reaches the best result, 0.9617. For error analysis, the best model makes 20 mistakes out of 522 test images. The errors are balanced: 10 healthy images are predicted as unhealthy, and 10 unhealthy images are predicted as healthy. Among those errors, 12 have predicted-class confidence at least 0.80, which means some remaining mistakes are high-confidence and should be inspected carefully before deployment.
+
+\textbf{Transition to p4.}
+Finally, Jiaxu will discuss safety and ethics, then summarize the takeaways.
+
+\parthead{p4}{Safety, Ethics, Takeaways, and Closing}{Jiaxu Zhang}{Slides 9--10}
+
+\textbf{Slide 9: Safety, ethics, and takeaways.}
+Although the model performs well on the held-out test set, it should not be treated as an authoritative nutrition or health tool. The labels healthy and unhealthy are coarse proxies. Real nutritional meaning depends on ingredients, portion size, preparation method, cuisine, and individual medical context. There are also privacy concerns if users upload meal images, since images can contain personal or contextual information. The high-confidence errors are especially important: they show that even a high-accuracy model can be confidently wrong.
+
+The main technical takeaway is that transfer learning is the dominant performance driver for this task. The simple CNN reaches 0.8027 test accuracy, frozen ResNet18 reaches 0.8697, and the best fine-tuned ResNet18 reaches 0.9617 accuracy and 0.9944 ROC AUC. Our conclusion is that the current system is suitable as an academic classifier and experimental pipeline, but not as a production health advisor. Future work should include confidence calibration, larger backbones, longer representation-learning runs, and external validation on independently collected data.
+
+\textbf{Slide 10: Thank you.}
+That concludes our presentation. Thank you for listening, and we are happy to take questions.
+
+\end{document}

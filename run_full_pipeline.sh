@@ -17,7 +17,7 @@ Optional environment variables:
   EVAL_BATCH_SIZE         Batch size for evaluation. Default: 64
   CLASSIFIER_EPOCHS       Epochs for classifier training. Default: 5
   FINETUNE_EPOCHS         Epochs for full ResNet18 fine-tuning. Default: 8
-  FINETUNE_LR             Learning rate for full ResNet18 fine-tuning. Default: 3e-5
+  FINETUNE_LR             Learning rate for full ResNet18 fine-tuning. Default: 1e-4
   SUPCON_EPOCHS           Epochs for SupCon pretraining. Default: 5
   NUM_WORKERS             DataLoader workers. Default: 0
   GRADCAM_IMAGES          Number of Grad-CAM examples. Default: 12
@@ -44,7 +44,7 @@ SUPCON_BATCH_SIZE="${SUPCON_BATCH_SIZE:-64}"
 EVAL_BATCH_SIZE="${EVAL_BATCH_SIZE:-64}"
 CLASSIFIER_EPOCHS="${CLASSIFIER_EPOCHS:-5}"
 FINETUNE_EPOCHS="${FINETUNE_EPOCHS:-8}"
-FINETUNE_LR="${FINETUNE_LR:-3e-5}"
+FINETUNE_LR="${FINETUNE_LR:-1e-4}"
 SUPCON_EPOCHS="${SUPCON_EPOCHS:-5}"
 NUM_WORKERS="${NUM_WORKERS:-0}"
 GRADCAM_IMAGES="${GRADCAM_IMAGES:-12}"

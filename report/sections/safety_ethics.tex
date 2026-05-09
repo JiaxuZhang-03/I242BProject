@@ -1,0 +1,7 @@
+\section{Safety, Security, and Ethics}
+
+The model should not be deployed as an authoritative nutrition or health advisor. The labels \Healthy{} and \Unhealthy{} simplify a complex nutritional judgment that depends on ingredients, portion size, preparation, culture, dietary constraints, and individual medical context. A visually plausible prediction can therefore be misleading even when the classifier is accurate on the held-out dataset.
+
+At large scale, the main safety risk is over-reliance: users or organizations might treat the output as dietary guidance rather than a coarse visual categorization. The observed \(0.9617\) test accuracy still corresponds to 20 errors on 522 held-out images, including 12 high-confidence errors. A production system would need calibrated uncertainty, human review for high-impact uses, clearer label definitions, and evaluation on data collected from the intended deployment population.
+
+There are also fairness and privacy concerns. Food appearance varies by cuisine, region, socioeconomic context, and image quality; a model trained on one dataset may perform worse on underrepresented foods or presentation styles. If user-uploaded meal images were collected, the system would need safeguards for consent, retention, access control, and removal of incidental personal information. For these reasons, the current project is best viewed as a controlled academic study and not as a ready-to-deploy health tool.
