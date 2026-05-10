@@ -47,6 +47,21 @@ report/main.pdf
 scratch/
 UC_Berkeley_Beamer_Theme__1_/
 
+# Interactive demo local/deployment artifacts
+interactive_demo/**/.cache/
+interactive_demo/**/__pycache__/
+interactive_demo/**/*.pt
+interactive_demo/**/best_model.pt
+interactive_demo/**/model/
+interactive_demo/uploads/
+
+# Local manual test uploads/screenshots
+/test.png
+/Test2.png
+/test*.jpg
+/test*.jpeg
+/test*.webp
+
 # OS / editor files
 .DS_Store
 .vscode/

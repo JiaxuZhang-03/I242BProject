@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Food Health Lens</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar" aria-label="Demo header">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <div>
+          <p class="eyebrow">INDENG 1/242B Demo</p>
+          <h1>Food Health Lens</h1>
+        </div>
+        <div class="model-chip">
+          <span>ResNet18</span>
+          <strong>96.17% test accuracy</strong>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <section class="upload-panel" aria-labelledby="upload-title">
+          <div class="panel-title">
+            <p class="eyebrow">Input</p>
+            <h2 id="upload-title">Food Photo</h2>
+          </div>
+
+          <label class="dropzone" id="dropzone" for="file-input">
+            <input id="file-input" type="file" accept="image/*" />
+            <img id="preview" class="preview" alt="Selected food preview" />
+            <div class="empty-preview" id="empty-preview" aria-hidden="true">
+              <div class="plate">
+                <span class="plate-leaf"></span>
+                <span class="plate-wedge"></span>
+                <span class="plate-dot"></span>
+              </div>
+              <div>
+                <strong>Upload a food image</strong>
+                <span>JPG, PNG, WEBP</span>
+              </div>
+            </div>
+          </label>
+
+          <div class="actions">
+            <button class="secondary-button" type="button" id="choose-button">Choose</button>
+            <button class="primary-button" type="button" id="analyze-button" disabled>
+              Analyze
+            </button>
+          </div>
+
+          <p class="file-readout" id="file-readout">No image selected</p>
+        </section>
+
+        <section class="result-panel" aria-labelledby="result-title">
+          <div class="panel-title">
+            <p class="eyebrow">Prediction</p>
+            <h2 id="result-title">Health Signal</h2>
+          </div>
+
+          <div class="status-strip">
+            <span class="status-dot" id="status-dot"></span>
+            <span id="status-text">Ready</span>
+          </div>
+
+          <div class="result-hero" id="result-hero">
+            <p class="result-label" id="result-label">Waiting</p>
+            <p class="result-confidence" id="result-confidence">--</p>
+          </div>
+
+          <div class="confidence-meter" aria-label="Prediction confidence">
+            <div class="meter-track">
+              <span class="meter-fill" id="meter-fill"></span>
+            </div>
+            <div class="meter-scale">
+              <span>Low</span>
+              <span>High</span>
+            </div>
+          </div>
+
+          <div class="probabilities" aria-label="Class probabilities">
+            <div class="probability-row">
+              <span>Healthy</span>
+              <strong id="healthy-prob">--</strong>
+            </div>
+            <div class="probability-row">
+              <span>Unhealthy</span>
+              <strong id="unhealthy-prob">--</strong>
+            </div>
+          </div>
+
+          <div class="model-notes">
+            <div>
+              <span>Classes</span>
+              <strong>healthy / unhealthy</strong>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="credits">
+        &copy; 2026 Xutong Dong · Zhaoning Liang · Yirong Li · Jiaxu Zhang
+      </footer>
+    </div>
+
+    <script src="/script.js"></script>
+  </body>
+</html>
